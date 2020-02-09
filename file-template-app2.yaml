@@ -1,0 +1,37 @@
+# app.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app2
+  labels:
+    app: vault-agent-demo2-dev
+spec:
+  selector:
+    matchLabels:
+      app: vault-agent-demo2-dev
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/role: "vapp2dev"
+        vault.hashicorp.com/agent-inject-secret-postgres-database-config.txt: "secret/app2/dev/helloapp2"
+        vault.hashicorp.com/agent-inject-template-postgres-database-config.txt: |
+          {{- with secret "secret/app2/dev/helloapp2" -}}
+          postgresql://{{ .Data.data.username }}:{{ .Data.data.password }}@postgres:5432/wizard
+          {{- end -}}
+      labels:
+        app: vault-agent-demo2-dev
+    spec:
+      serviceAccountName: svcapp2dev
+      containers:
+      - name: app2
+        image: jweissig/app:0.0.1
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: svcapp2dev
+  labels:
+    app: vault-agent-demo2-dev
