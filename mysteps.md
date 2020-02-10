@@ -175,7 +175,7 @@ kubectl exec -it vault-0 -- vault operator init -n 1 -t 1
 you can then unseal it
 
 ``` bash
-kubectl exec -it vault-0 -- vault operator unseal dYQFtB2DaPGR05oPujEdQMDBVlaSn//SDULOYfnAGbA=
+kubectl exec -it vault-0 -- vault operator unseal <unseal token from init>
 ```
 
 Then it should be unsealed, but that will just initalize and unseal that one instance. Not very practical. wolud have to unseal all manually, and then unseal if they die.
@@ -208,19 +208,8 @@ helm install consul ./consul-helm
 first we need an account that will have permissions, this will [create a service principal with a secret](https://www.terraform.io/docs/providers/azurerm/guides/service_principal_client_secret.html)
 
 ``` bash
+export ARM_SUBSCRIPTION_ID="<subscriptionid>"
 az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/$ARM_SUBSCRIPTION_ID"
-```
-
-take that:
-
-``` bash
-{
-  "appId": "29fa5293-1b16-4d4f-99f0-edb62d543f05",
-  "displayName": "azure-cli-2020-02-09-05-01-15",
-  "name": "http://azure-cli-2020-02-09-05-01-15",
-  "password": "6a77265d-a0a7-4651-9746-38d87a8dcd44",
-  "tenant": "9ca75128-a244-4596-877b-f24828e476e2"
-}
 ```
 
 app id is client id
@@ -231,10 +220,10 @@ and update the auto-unseal-terraform/terraform.tfvars
 and export them to your shell 
 
 ``` bash
-export ARM_TENANT_ID="9ca75128-a244-4596-877b-f24828e476e2"
-export ARM_CLIENT_ID="29fa5293-1b16-4d4f-99f0-edb62d543f05"
-export ARM_CLIENT_SECRET="6a77265d-a0a7-4651-9746-38d87a8dcd44"
-export ARM_SUBSCRIPTION_ID="9d893f69-37bd-4f82-9058-3edfd9af9796"
+export ARM_TENANT_ID="<tenant id>"
+export ARM_CLIENT_ID="<appId>"
+export ARM_CLIENT_SECRET="<password>"
+export ARM_SUBSCRIPTION_ID="<subscriptionid>"
 ```
 
 I think it actually uses the shell and not the vars...
@@ -287,10 +276,10 @@ The only thing that should change is the config block for keyvault, but this is 
       #   crypto_key  = "vault-helm-unseal-key"
       #}
       seal "azurekeyvault" {
-        client_id      = "29fa5293-1b16-4d4f-99f0-edb62d543f05"
-        client_secret  = "6a77265d-a0a7-4651-9746-38d87a8dcd44"
-        tenant_id      = "9ca75128-a244-4596-877b-f24828e476e2"
-        vault_name     = "learn-vault-00e8b23a"
+        client_id      = "<appid>"
+        client_secret  = "<password>"
+        tenant_id      = "<tenantid>"
+        vault_name     = "<vault name created by terraform>"
         key_name       = "generated-key"
       }
 ```
