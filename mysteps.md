@@ -377,7 +377,7 @@ kubectl exec -ti vault-0 /bin/sh
 ### Inside the vault container command line
 
 ``` bash
-export VAULT_TOKEN=s.Efn0BeHPNDQgb1gyxWiUB3NU
+export VAULT_TOKEN=s.2Ok4MDoDOQpnNG12WBjMDq5x
 ```
 
 now make the policy
@@ -408,7 +408,7 @@ vault write auth/kubernetes/config \
 
 vault write auth/kubernetes/role/myapp \
    bound_service_account_names=app \
-   bound_service_account_namespaces=vaultha \
+   bound_service_account_namespaces=vault \
    policies=app \
    ttl=1h
 ```
