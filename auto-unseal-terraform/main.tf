@@ -3,7 +3,7 @@ provider "azurerm" {
 }
 
 data "azurerm_resource_group" "vault" {
-  name = "MC_awdresourcegroup_awdakscluster_westus"
+  name = var.resource_group
 }
 
 resource "random_id" "keyvault" {
